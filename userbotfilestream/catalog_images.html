@@ -1,0 +1,1209 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{channel_title}} - Catálogo de Escenas</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --bg-color: #0c0b12;
+            --surface-color: #14131f;
+            --border-color: #1f1d2e;
+            --border-hover: #322f47;
+            --text-primary: #ffffff;
+            --text-secondary: #9499b0;
+            --accent-color: #7f5af0;
+            --accent-hover: #9675fa;
+            --accent-gradient: linear-gradient(135deg, #7f5af0 0%, #d53f8c 100%);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            scrollbar-width: thin;
+            scrollbar-color: var(--border-hover) #0c0b12;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0c0b12;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--border-hover);
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding-bottom: 60px;
+            overflow-x: hidden;
+        }
+
+        .header {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px 20px 20px;
+            text-align: center;
+        }
+
+        h1.title {
+            font-size: 2.4rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .subtitle span.badge {
+            background: rgba(127, 90, 240, 0.1);
+            color: #b3a5ff;
+            border: 1px solid rgba(127, 90, 240, 0.2);
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .search-container {
+            max-width: 600px;
+            margin: 0 auto 40px auto;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 14px 20px 14px 50px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            background: #14131f;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-primary);
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .search-input:focus {
+            border-color: var(--accent-color);
+            background: #171624;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            pointer-events: none;
+            transition: color 0.2s;
+        }
+
+        .search-input:focus + .search-icon {
+            color: var(--accent-color);
+        }
+
+        .grid-container {
+            max-width: 96%;
+            margin: 0 auto;
+            padding: 0 10px;
+            display: grid;
+            grid-template-columns: repeat(1, 1fr);
+            gap: 20px;
+        }
+
+        @media (min-width: 480px) {
+            .grid-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 768px) {
+            .grid-container {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .grid-container {
+                grid-template-columns: repeat(5, 1fr);
+            }
+        }
+
+        .video-card {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: border-color 0.3s, transform 0.3s;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+            min-height: auto;
+        }
+
+        .video-card:hover {
+            border-color: var(--border-hover);
+            transform: translateY(-2px);
+        }
+
+        .card-thumbnail {
+            width: 100%;
+            aspect-ratio: 16/10;
+            background: var(--surface-color);
+            position: relative;
+            overflow: hidden;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .card-thumbnail img.card-poster {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 2;
+            transition: opacity 0.3s ease;
+        }
+
+        .card-info {
+            padding: 10px 14px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            flex-grow: 1;
+        }
+
+        .card-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .video-meta {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 0;
+        }
+
+        .meta-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            background: rgba(255, 255, 255, 0.02);
+            padding: 3px 8px;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .copy-btn-compact {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .copy-btn-compact:hover {
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text-primary);
+            border-color: var(--border-hover);
+        }
+
+        /* Modal del listado de escenas (50 escenas) */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(6, 5, 10, 0.96);
+            backdrop-filter: blur(12px);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-header {
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-color);
+            background-color: var(--surface-color);
+        }
+
+        .modal-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 80%;
+        }
+
+        .modal-close-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-family: inherit;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .modal-close-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .scenes-grid-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .scenes-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        @media (min-width: 480px) {
+            .scenes-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (min-width: 768px) {
+            .scenes-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 16px;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .scenes-grid {
+                grid-template-columns: repeat(5, 1fr);
+            }
+        }
+
+        .scene-card {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            padding-top: 56.25%; /* 16:9 */
+        }
+
+        .scene-card:hover {
+            transform: scale(1.03);
+            border-color: var(--accent-color);
+            box-shadow: 0 8px 16px rgba(127, 90, 240, 0.2);
+        }
+
+        .scene-img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .scene-num-badge {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(4px);
+            color: #fff;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        /* Lightbox del visor de imagen grande */
+        .viewer-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(2, 1, 5, 0.99);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+        }
+
+        .viewer-modal.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .viewer-container {
+            position: relative;
+            max-width: 95%;
+            max-height: 85vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .viewer-img {
+            max-width: 100%;
+            max-height: 85vh;
+            object-fit: contain;
+            border-radius: 8px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            user-select: none;
+            -webkit-user-drag: none;
+        }
+
+        .viewer-btn {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #fff;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            z-index: 2100;
+            backdrop-filter: blur(8px);
+        }
+
+        .viewer-btn:hover {
+            background: rgba(127, 90, 240, 0.2);
+            border-color: var(--accent-color);
+            transform: scale(1.05);
+        }
+
+        .viewer-prev {
+            left: -60px;
+        }
+
+        .viewer-next {
+            right: -60px;
+        }
+
+        @media (max-width: 1024px) {
+            .viewer-prev {
+                left: 10px;
+                width: 44px;
+                height: 44px;
+            }
+            .viewer-next {
+                right: 10px;
+                width: 44px;
+                height: 44px;
+            }
+        }
+
+        @media (max-width: 680px) {
+            body {
+                overflow-x: hidden;
+                width: 100%;
+            }
+
+            .header {
+                padding: 24px 12px 16px 12px;
+            }
+
+            h1.title {
+                font-size: 1.5rem;
+                line-height: 1.25;
+                word-break: break-word;
+            }
+
+            .subtitle {
+                font-size: 0.85rem;
+                gap: 6px;
+                flex-wrap: wrap;
+                justify-content: center;
+                margin-bottom: 20px;
+            }
+
+            .search-container {
+                width: 100%;
+                max-width: 100%;
+                padding: 0 4px;
+                margin-bottom: 20px;
+            }
+
+            .search-input {
+                font-size: 0.9rem;
+                padding: 12px 16px 12px 42px;
+                border-radius: 10px;
+            }
+
+            .search-icon {
+                left: 14px;
+                width: 18px;
+                height: 18px;
+            }
+
+            .grid-container {
+                max-width: 100%;
+                padding: 0 8px;
+                gap: 12px;
+                grid-template-columns: repeat(1, 1fr);
+            }
+
+            .scenes-grid-container {
+                padding: 10px;
+            }
+
+            .modal-header {
+                padding: 12px 14px;
+            }
+
+            .modal-title {
+                font-size: 0.95rem;
+            }
+        }
+
+        .viewer-close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #fff;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s;
+            z-index: 2200;
+        }
+
+        .viewer-close-btn:hover {
+            background: rgba(229, 62, 62, 0.2);
+            border-color: #fc8181;
+        }
+
+        .viewer-counter {
+            position: absolute;
+            bottom: -35px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* Toast notifications */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translate(-50%, 20px);
+            background: var(--accent-gradient);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            z-index: 3000;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        .toast.active {
+            transform: translate(-50%, 0);
+            opacity: 1;
+        }
+
+        /* Paginación */
+        .pagination-container {
+            max-width: 96%;
+            margin: 40px auto 0 auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .pagination-btn {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .pagination-btn:hover:not(:disabled) {
+            border-color: var(--border-hover);
+            background: rgba(255, 255, 255, 0.02);
+            transform: translateY(-1px);
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .pagination-info {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            padding: 6px 12px;
+        }
+
+        /* Empty state */
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            display: block;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1 class="title">{{channel_title}}</h1>
+        <div class="subtitle">
+            <i data-lucide="image"></i> Catálogo de Escenas del Canal
+            <span class="badge" id="video-count">0 videos</span>
+        </div>
+        
+        <div class="search-container">
+            <input type="text" id="search-input" class="search-input" placeholder="Buscar por título del video..." autocomplete="off">
+            <i data-lucide="search" class="search-icon"></i>
+        </div>
+    </div>
+
+    <!-- Grid de Videos/Galerías -->
+    <div class="grid-container" id="galleries-grid">
+        <!-- Generado dinámicamente por JS -->
+    </div>
+
+    <!-- Controles de Paginación -->
+    <div class="pagination-container" id="pagination-controls">
+        <!-- Generado dinámicamente por JS -->
+    </div>
+
+    <!-- Modal del Visor de 50 Escenas -->
+    <div class="modal" id="scenes-modal">
+        <div class="modal-header">
+            <div class="modal-title" id="modal-title">Cargando Escenas...</div>
+            <button class="modal-close-btn" onclick="closeScenesModal()">
+                <i data-lucide="x"></i> Cerrar Galería
+            </button>
+        </div>
+        <div class="scenes-grid-container" style="position: relative; flex-grow: 1; display: flex; flex-direction: column;">
+            <!-- Loading Indicator Overlay -->
+            <div id="scenes-loading-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(12, 11, 18, 0.95); z-index: 10; gap: 16px; opacity: 1; transition: opacity 0.3s;">
+                <div style="width: 48px; height: 48px; border: 4px solid rgba(127, 90, 240, 0.1); border-top: 4px solid var(--accent-color); border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                <div id="scenes-loading-text" style="font-size: 1.1rem; font-weight: 600; color: var(--text-primary);">Preparando generación de escenas...</div>
+                <div style="font-size: 0.85rem; color: var(--text-secondary); max-width: 320px; text-align: center;">Esto solo tardará unos segundos la primera vez.</div>
+            </div>
+            <div class="scenes-grid" id="modal-scenes-grid" style="flex-grow: 1;">
+                <!-- 50 Scene thumbnails here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Visor Fullscreen de Imagen -->
+    <div class="viewer-modal" id="image-viewer-modal">
+        <button class="viewer-close-btn" onclick="closeImageViewer()">
+            <i data-lucide="x"></i>
+        </button>
+        <button class="viewer-btn viewer-prev" id="viewer-prev-btn" onclick="prevImage(event)">
+            <i data-lucide="chevron-left" style="width:28px;height:28px;"></i>
+        </button>
+        <div class="viewer-container">
+            <img class="viewer-img" id="viewer-main-img" src="" alt="Escena en alta resolución">
+            <div class="viewer-counter" id="viewer-counter">1 / 50</div>
+        </div>
+        <button class="viewer-btn viewer-next" id="viewer-next-btn" onclick="nextImage(event)">
+            <i data-lucide="chevron-right" style="width:28px;height:28px;"></i>
+        </button>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <span id="toast-text">Toast Message</span>
+    </div>
+
+    <script>
+        // Datos inyectados por Python
+        const videos = {{videos_json}};
+        const chat_id = "{{chat_id}}";
+        
+        let currentVideosList = [...videos];
+        let currentPage = 1;
+        const itemsPerPage = 30;
+        
+        let activeVideo = null;
+        let activeSceneIndex = 1; // 1 to 50
+        let progressInterval = null;
+
+        const galleriesGrid = document.getElementById("galleries-grid");
+        const paginationControls = document.getElementById("pagination-controls");
+        const videoCountBadge = document.getElementById("video-count");
+        const searchInput = document.getElementById("search-input");
+        
+        const scenesModal = document.getElementById("scenes-modal");
+        const modalTitle = document.getElementById("modal-title");
+        const modalScenesGrid = document.getElementById("modal-scenes-grid");
+
+        const imageViewerModal = document.getElementById("image-viewer-modal");
+        const viewerMainImg = document.getElementById("viewer-main-img");
+        const viewerCounter = document.getElementById("viewer-counter");
+
+        const toast = document.getElementById("toast");
+        
+        // --- SISTEMA DE MEMORIA DE DESPLAZAMIENTO (SCROLL) Y PÁGINA ---
+        let scrollSaveTimeout = null;
+
+        function saveCatalogState() {
+            if (isSyncingURLState) return;
+            const state = {
+                page: currentPage,
+                scrollY: window.scrollY,
+                videoId: (scenesModal && scenesModal.classList.contains("active") && activeVideo) ? activeVideo.id : null,
+                sceneIndex: (imageViewerModal && imageViewerModal.classList.contains("active")) ? activeSceneIndex : null,
+                timestamp: Date.now()
+            };
+            localStorage.setItem(`catalog_images_last_state_${chat_id}`, JSON.stringify(state));
+        }
+
+        // --- Sincronización de URL (Deep Linking & Estado del Navegador) ---
+        let isSyncingURLState = false;
+
+        function updateURLState(replace = false) {
+            if (isSyncingURLState) return;
+            const url = new URL(window.location.href);
+            const params = url.searchParams;
+
+            // Paginación
+            if (currentPage > 1) {
+                params.set('page', currentPage);
+            } else {
+                params.delete('page');
+            }
+
+            // Búsqueda
+            const queryVal = searchInput ? searchInput.value.trim() : "";
+            if (queryVal) {
+                params.set('q', queryVal);
+            } else {
+                params.delete('q');
+            }
+
+            // Video / Galería abierta
+            if (scenesModal && scenesModal.classList.contains("active") && activeVideo) {
+                params.set('v', activeVideo.id);
+            } else {
+                params.delete('v');
+            }
+
+            // Imagen / Escena abierta
+            if (imageViewerModal && imageViewerModal.classList.contains("active") && activeSceneIndex) {
+                params.set('scene', activeSceneIndex);
+            } else {
+                params.delete('scene');
+            }
+
+            const searchString = params.toString() ? '?' + params.toString() : '';
+            const newRelativeUrl = url.pathname + searchString;
+
+            if (window.location.search !== searchString) {
+                if (replace) {
+                    history.replaceState(null, '', newRelativeUrl);
+                } else {
+                    history.pushState(null, '', newRelativeUrl);
+                }
+            }
+            saveCatalogState();
+        }
+
+        function syncStateFromURL(isInitial = false) {
+            isSyncingURLState = true;
+            try {
+                if (isInitial && !window.location.search) {
+                    try {
+                        const savedStateRaw = localStorage.getItem(`catalog_images_last_state_${chat_id}`);
+                        if (savedStateRaw) {
+                            const savedState = JSON.parse(savedStateRaw);
+                            if (savedState && (Date.now() - savedState.timestamp < 30 * 24 * 3600 * 1000)) {
+                                if (savedState.page) currentPage = savedState.page;
+                                if (savedState.scrollY) {
+                                    setTimeout(() => {
+                                        window.scrollTo({ top: savedState.scrollY, behavior: 'smooth' });
+                                    }, 150);
+                                }
+                            }
+                        }
+                    } catch (e) {}
+                }
+
+                const params = new URLSearchParams(window.location.search);
+                
+                const pageVal = parseInt(params.get('page')) || 1;
+                currentPage = pageVal > 0 ? pageVal : 1;
+
+                const queryVal = params.get('q') || "";
+                if (searchInput) {
+                    searchInput.value = queryVal;
+                    if (queryVal === "") {
+                        currentVideosList = [...videos];
+                    } else {
+                        currentVideosList = videos.filter(v => 
+                            v.title.toLowerCase().includes(queryVal.toLowerCase())
+                        );
+                    }
+                }
+
+                renderGrid(currentVideosList);
+
+                const vidParam = params.get('v');
+                if (vidParam) {
+                    const vidId = parseInt(vidParam) || vidParam;
+                    const targetVideo = videos.find(v => v.id == vidId);
+                    if (targetVideo) {
+                        openScenesModal(targetVideo, true);
+
+                        const sceneParam = parseInt(params.get('scene'));
+                        if (sceneParam && sceneParam >= 1 && sceneParam <= 30) {
+                            openImageViewer(sceneParam, true);
+                        } else {
+                            if (imageViewerModal.classList.contains("active")) {
+                                closeImageViewer(true);
+                            }
+                        }
+                    }
+                } else {
+                    if (scenesModal.classList.contains("active")) {
+                        closeScenesModal(true);
+                    }
+                    if (imageViewerModal.classList.contains("active")) {
+                        closeImageViewer(true);
+                    }
+                }
+            } finally {
+                isSyncingURLState = false;
+            }
+        }
+
+        function init() {
+            lucide.createIcons();
+            videoCountBadge.innerText = `${videos.length} videos`;
+            
+            syncStateFromURL(true);
+
+            window.addEventListener("popstate", () => {
+                syncStateFromURL(false);
+            });
+
+            window.addEventListener("scroll", () => {
+                if (!scrollSaveTimeout) {
+                    scrollSaveTimeout = setTimeout(() => {
+                        saveCatalogState();
+                        scrollSaveTimeout = null;
+                    }, 500);
+                }
+            });
+
+            window.addEventListener("beforeunload", saveCatalogState);
+            
+            // Evento de búsqueda
+            searchInput.addEventListener("input", (e) => {
+                const query = e.target.value.toLowerCase().trim();
+                if (query === "") {
+                    currentVideosList = [...videos];
+                } else {
+                    currentVideosList = videos.filter(v => 
+                        v.title.toLowerCase().includes(query)
+                    );
+                }
+                currentPage = 1;
+                renderGrid(currentVideosList);
+                updateURLState(true);
+            });
+        }
+
+        function formatDisplayTitle(title) {
+            if (!title) return "";
+            const cleanTitle = title.trim();
+            if (/^v[\s_-]*\d+/i.test(cleanTitle)) {
+                return "";
+            }
+            return cleanTitle;
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast("¡Enlace copiado al portapapeles!");
+            }).catch(err => {
+                console.error("No se pudo copiar: ", err);
+                showToast("Error al copiar el enlace", true);
+            });
+        }
+
+        function showToast(text, isError = false) {
+            const toastText = document.getElementById("toast-text");
+            toastText.innerText = text;
+            if (isError) {
+                toast.style.background = "linear-gradient(135deg, #e53e3e 0%, #feb2b2 100%)";
+            } else {
+                toast.style.background = "var(--accent-gradient)";
+            }
+            toast.classList.add("active");
+            setTimeout(() => {
+                toast.classList.remove("active");
+            }, 3000);
+        }
+
+        function renderGrid(list) {
+            galleriesGrid.innerHTML = "";
+            videoCountBadge.innerText = `${list.length} video${list.length !== 1 ? 's' : ''}`;
+            
+            const totalPages = Math.ceil(list.length / itemsPerPage);
+            if (currentPage > totalPages && totalPages > 0) {
+                currentPage = 1;
+            }
+
+            if (list.length === 0) {
+                galleriesGrid.innerHTML = `
+                    <div class="empty-state">
+                        <i data-lucide="image-off" style="width: 48px; height: 48px;"></i>
+                        <h3>No se encontraron resultados</h3>
+                        <p>Intenta con otros términos de búsqueda.</p>
+                    </div>
+                `;
+                renderPaginationControls(0);
+                return;
+            }
+
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = Math.min(startIndex + itemsPerPage, list.length);
+            const pageItems = list.slice(startIndex, endIndex);
+
+            pageItems.forEach(v => {
+                const card = document.createElement("div");
+                card.className = "video-card";
+                card.onclick = () => openScenesModal(v);
+
+                const displayTitle = formatDisplayTitle(v.title);
+
+                card.innerHTML = `
+                    <div class="card-thumbnail">
+                        <img class="card-poster" src="${v.stream_url}&thumb=true" alt="Portada" onerror="this.style.display='none';">
+                        <div style="position: absolute; bottom: 8px; right: 8px; background: rgba(8, 7, 13, 0.85); backdrop-filter: blur(4px); color: #fff; padding: 2px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; z-index: 5; border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 4px;">
+                            <i data-lucide="images" style="width: 12px; height: 12px;"></i> 30 Escenas
+                        </div>
+                    </div>
+                    <div class="card-info">
+                        <div class="card-footer">
+                            <div class="video-meta">
+                                <div class="meta-tag">
+                                    <i data-lucide="clock"></i>
+                                    <span>${v.duration || 'N/A'}</span>
+                                </div>
+                                <div class="meta-tag">
+                                    <i data-lucide="hard-drive"></i>
+                                    <span>${v.size || 'N/A'}</span>
+                                </div>
+                            </div>
+                            <button class="copy-btn-compact" title="Copiar Enlace" onclick="event.stopPropagation(); copyToClipboard('${v.stream_url}');">
+                                <i data-lucide="copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                galleriesGrid.appendChild(card);
+            });
+
+            renderPaginationControls(list.length);
+            lucide.createIcons();
+        }
+
+        function renderPaginationControls(totalItems) {
+            paginationControls.innerHTML = "";
+            const totalPages = Math.ceil(totalItems / itemsPerPage);
+            if (totalPages <= 1) return;
+
+            const prevBtn = document.createElement("button");
+            prevBtn.className = "pagination-btn";
+            prevBtn.innerHTML = `<i data-lucide="chevron-left"></i> Anterior`;
+            prevBtn.disabled = currentPage === 1;
+            prevBtn.addEventListener("click", () => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    renderGrid(currentVideosList);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    updateURLState(false);
+                }
+            });
+
+            const infoSpan = document.createElement("span");
+            infoSpan.className = "pagination-info";
+            infoSpan.innerText = `Página ${currentPage} de ${totalPages}`;
+
+            const nextBtn = document.createElement("button");
+            nextBtn.className = "pagination-btn";
+            nextBtn.innerHTML = `Siguiente <i data-lucide="chevron-right"></i>`;
+            nextBtn.disabled = currentPage === totalPages;
+            nextBtn.addEventListener("click", () => {
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    renderGrid(currentVideosList);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    updateURLState(false);
+                }
+            });
+
+            paginationControls.appendChild(prevBtn);
+            paginationControls.appendChild(infoSpan);
+            paginationControls.appendChild(nextBtn);
+        }
+
+        // Abre el visor de las 30 escenas del video
+        async function openScenesModal(video, skipURLState = false) {
+            activeVideo = video;
+            modalTitle.innerText = video.title;
+            modalScenesGrid.innerHTML = "";
+            
+            if (progressInterval) {
+                clearInterval(progressInterval);
+            }
+            
+            // Generar 30 placeholders iniciales oscuros en la cuadrícula
+            for (let i = 1; i <= 30; i++) {
+                const sceneCard = document.createElement("div");
+                sceneCard.className = "scene-card";
+                sceneCard.id = `scene-card-${i}`;
+                sceneCard.innerHTML = `
+                    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #13121d; color: rgba(255,255,255,0.06);">
+                        <i data-lucide="image" style="width: 24px; height: 24px;"></i>
+                    </div>
+                    <div class="scene-num-badge">Escena ${i}</div>
+                `;
+                modalScenesGrid.appendChild(sceneCard);
+            }
+            lucide.createIcons();
+            
+            // Mostrar modal y overlay de carga inicial
+            const loadingOverlay = document.getElementById("scenes-loading-overlay");
+            const loadingText = document.getElementById("scenes-loading-text");
+            
+            loadingText.innerText = "Preparando generación de escenas...";
+            loadingOverlay.style.display = "flex";
+            loadingOverlay.style.opacity = "1";
+            
+            scenesModal.classList.add("active");
+            document.body.style.overflow = "hidden"; // Desactivar scroll de fondo
+
+            if (!skipURLState) {
+                updateURLState(false);
+            }
+
+            // Arrancar el proceso de fondo
+            try {
+                await fetch(`/generate_scenes/${chat_id}/${video.id}`);
+            } catch (err) {
+                console.error("Error al iniciar generación: ", err);
+            }
+
+            // Consultar progreso cada segundo e ir cargando las imágenes WebP terminadas
+            progressInterval = setInterval(async () => {
+                if (!activeVideo || activeVideo.id !== video.id) {
+                    clearInterval(progressInterval);
+                    return;
+                }
+                
+                try {
+                    const res = await fetch(`/api/scene_progress/${chat_id}/${video.id}`);
+                    const data = await res.json();
+                    const progress = data.progress || 0;
+                    
+                    if (loadingText) {
+                        loadingText.innerText = `Generando escenas: ${progress} de 30 (${Math.round(progress * 100 / 30)}%)...`;
+                    }
+                    
+                    // Cargar imágenes listas
+                    for (let i = 1; i <= progress; i++) {
+                        const card = document.getElementById(`scene-card-${i}`);
+                        if (card && !card.querySelector(".scene-img")) {
+                            const sceneUrl = `/scenes_dynamic/${chat_id}/${video.id}/${i}.webp`;
+                            card.innerHTML = `
+                                <img class="scene-img" src="${sceneUrl}" alt="Escena ${i}" loading="lazy" style="opacity: 0; transition: opacity 0.3s;" onload="this.style.opacity=1;">
+                                <div class="scene-num-badge">Escena ${i}</div>
+                            `;
+                            card.addEventListener("click", () => openImageViewer(i));
+                        }
+                    }
+                    
+                    if (progress >= 30 || data.status === "completed") {
+                        clearInterval(progressInterval);
+                        loadingOverlay.style.opacity = "0";
+                        setTimeout(() => {
+                            loadingOverlay.style.display = "none";
+                        }, 300);
+                    }
+                } catch (err) {
+                    console.error("Error consultando progreso: ", err);
+                }
+            }, 1000);
+        }
+
+        function closeScenesModal(skipURLState = false) {
+            if (progressInterval) {
+                clearInterval(progressInterval);
+                progressInterval = null;
+            }
+            scenesModal.classList.remove("active");
+            document.body.style.overflow = ""; // Restaurar scroll
+            activeVideo = null;
+            if (!skipURLState) {
+                updateURLState(false);
+            }
+        }
+
+        // Abre la imagen en visor grande / pantalla completa
+        function openImageViewer(index, skipURLState = false) {
+            activeSceneIndex = index;
+            const imageUrl = `/scenes_dynamic/${chat_id}/${activeVideo.id}/${index}.webp`;
+            
+            viewerMainImg.src = imageUrl;
+            viewerCounter.innerText = `${index} / 30`;
+            imageViewerModal.classList.add("active");
+            if (!skipURLState) {
+                updateURLState(false);
+            }
+        }
+
+        function closeImageViewer(skipURLState = false) {
+            imageViewerModal.classList.remove("active");
+            viewerMainImg.src = "";
+            if (!skipURLState) {
+                updateURLState(false);
+            }
+        }
+
+        function nextImage(event) {
+            if (event) event.stopPropagation();
+            if (activeSceneIndex < 30) {
+                openImageViewer(activeSceneIndex + 1);
+            } else {
+                openImageViewer(1); // Ciclar
+            }
+        }
+
+        function prevImage(event) {
+            if (event) event.stopPropagation();
+            if (activeSceneIndex > 1) {
+                openImageViewer(activeSceneIndex - 1);
+            } else {
+                openImageViewer(30); // Ciclar
+            }
+        }
+
+        // Control por teclado en el visor grande
+        document.addEventListener("keydown", (e) => {
+            if (!imageViewerModal.classList.contains("active")) return;
+            
+            if (e.key === "Escape") {
+                closeImageViewer();
+            } else if (e.key === "ArrowRight") {
+                nextImage();
+            } else if (e.key === "ArrowLeft") {
+                prevImage();
+            }
+        });
+
+        window.addEventListener("DOMContentLoaded", init);
+    </script>
+</body>
+</html>

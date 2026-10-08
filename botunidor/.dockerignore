@@ -1,0 +1,7 @@
+sesion.session
+sesion.session-journal
+__pycache__/
+*.pyc
+.git/
+.env
+iniciar.bat

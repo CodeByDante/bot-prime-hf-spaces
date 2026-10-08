@@ -1,0 +1,96 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
+
+:root {
+  --foreground-rgb: 255, 255, 255;
+  --background-rgb: 10, 10, 10;
+  --primary-rgb: 187, 134, 252;
+}
+
+
+body {
+  margin: 0;
+  padding: 0;
+  color: rgb(var(--foreground-rgb));
+  background: #0a0a0a;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Elimina el margen superior del primer elemento para que empiece arriba del todo */
+.ProseMirror>*:first-child {
+  margin-top: 0 !important;
+}
+
+.ProseMirror p {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+}
+
+.ProseMirror ul {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+  margin: 1rem 0;
+}
+
+.ProseMirror ol {
+  list-style-type: decimal;
+  padding-left: 1.5rem;
+  margin: 1rem 0;
+}
+
+.ProseMirror li {
+  margin-bottom: 0.25rem;
+}
+
+/* Custom Text Selection */
+::selection {
+  background-color: rgba(168, 85, 247, 0.25);
+  /* Purple-500 with low opacity */
+  color: inherit;
+  /* Keep original text color */
+}
+
+/* Specific override for ProseMirror to ensure it takes precedence */
+.ProseMirror ::selection {
+  background-color: rgba(168, 85, 247, 0.25);
+  color: inherit;
+}
+
+/* Force no underline for links when configured */
+.no-underline-link {
+  text-decoration: none !important;
+}
+
+hr {
+  border: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  margin: 1.5rem 0;
+}
+
+.prose hr {
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  margin: 2rem 0;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, rgba(var(--primary-rgb), 0.1) 25%, rgba(var(--primary-rgb), 0.3) 50%, rgba(var(--primary-rgb), 0.1) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite linear;
+}

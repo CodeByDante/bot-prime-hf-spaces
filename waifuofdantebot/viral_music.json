@@ -1,0 +1,23 @@
+[
+    {
+        "id": "track_001",
+        "name": "Phonk Brazil",
+        "artist": "Viral Mix",
+        "file_id": null,
+        "path": "data/music/phonk_brazil.mp3"
+    },
+    {
+        "id": "track_002",
+        "name": "Sigma Theme",
+        "artist": "Patrick Bateman",
+        "file_id": null,
+        "path": "data/music/sigma_theme.mp3"
+    },
+    {
+        "id": "track_003",
+        "name": "Cute Anime Sound",
+        "artist": "Kawaii",
+        "file_id": null,
+        "path": "data/music/cute_anime.mp3"
+    }
+]

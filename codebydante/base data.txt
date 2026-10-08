@@ -1,0 +1,13 @@
+1. Base de Datos (Firebase)
+El proyecto está conectado a Firebase Firestore. Los detalles de la cuenta y el proyecto en Firebase son los siguientes:
+
+Project ID: twistedbrody-9d163 (Este es el nombre del proyecto en la consola de Firebase).
+Dominio: twistedbrody-9d163.firebaseapp.com
+Colección (Tabla) principal: Guarda los datos en una colección llamada neonvault_items.
+(Nota: Toda esta configuración de Firebase está guardada en el archivo services/firebase.ts).
+
+2. API de Inteligencia Artificial (Google Gemini)
+El proyecto también está preparado para conectarse a la API de Google Gemini (usado para funciones de IA en la página).
+
+La configuración para esto espera que tengas un archivo .env en la raíz de tu proyecto con una variable llamada VITE_GEMINI_API_KEY donde pones tu clave de la API de Google.
+Si necesitas cambiar la cuenta de Firebase a otra tuya, tendrías que ir a tu consola de Firebase, crear un proyecto nuevo y reemplazar las claves (apiKey, authDomain, projectId, etc.) que están en el archivo services/firebase.ts (líneas 17 a 25).

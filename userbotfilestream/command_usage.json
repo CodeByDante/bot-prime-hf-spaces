@@ -1,0 +1,22 @@
+{
+    "ping": 3,
+    "capturas": 3,
+    "elimina_duplicados": 2,
+    "limpiar": 30,
+    "quitar_etiqueta_de_renvio": 1,
+    "duplicados_miniatura": 14,
+    "elimina_duplicados_miniatura": 2,
+    "duplicados_modo_avanzado": 1,
+    "repetidos": 16,
+    "busqueda_inversa_bot": 7,
+    "prime_video": 64,
+    "limpiar_catalogo": 8,
+    "busqueda": 2,
+    "descargar_video": 2,
+    "prime_imagenes": 4,
+    "manga_flow": 4,
+    "r": 10,
+    "v": 12,
+    "p": 8,
+    "c": 11
+}

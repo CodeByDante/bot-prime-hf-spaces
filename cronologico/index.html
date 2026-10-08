@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bot Cronológico - Monitoreo & Diagnósticos HF Spaces</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header principal -->
+    <header class="app-header">
+      <div class="header-branding">
+        <div class="logo-pulse"></div>
+        <div>
+          <h1>Bot Cronológico <span class="badge-tag">Static v1.0</span></h1>
+          <p class="subtitle">Monitoreo y Diagnóstico Multi-Consola en Tiempo Real para Hugging Face Spaces (Gratuito)</p>
+        </div>
+      </div>
+      
+      <div class="header-actions">
+        <div class="countdown-card" id="countdownCard">
+          <span class="countdown-label">PRÓXIMO CICLO CRON</span>
+          <span class="countdown-value" id="nextRunTimer">--:--</span>
+        </div>
+        <button id="btnRunNow" class="btn btn-primary btn-glow">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+          Ejecutar Diagnóstico Ahora
+        </button>
+      </div>
+    </header>
+
+    <!-- Métricas y Estadísticas Resumen -->
+    <section class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon total-icon">📦</div>
+        <div class="stat-content">
+          <span class="stat-value" id="statTotal">19</span>
+          <span class="stat-label">Total Espacios Monitoreados</span>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon online-icon">✓</div>
+        <div class="stat-content">
+          <span class="stat-value text-success" id="statOnline">0</span>
+          <span class="stat-label">En Línea (100% Operativos)</span>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon degraded-icon">⚠</div>
+        <div class="stat-content">
+          <span class="stat-value text-warning" id="statDegraded">0</span>
+          <span class="stat-label">Parcial / Degradados</span>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon offline-icon">✗</div>
+        <div class="stat-content">
+          <span class="stat-value text-danger" id="statOffline">0</span>
+          <span class="stat-label">Fuera de Línea / Fallos</span>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon latency-icon">⚡</div>
+        <div class="stat-content">
+          <span class="stat-value" id="statLatency">0 ms</span>
+          <span class="stat-label">Latencia Promedio Backend</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Barra de Control y Ajustes -->
+    <div class="controls-bar">
+      <div class="search-box">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <input type="text" id="searchInput" placeholder="Buscar espacio por nombre o URL...">
+      </div>
+
+      <div class="controls-right">
+        <div class="control-group">
+          <label for="intervalSelect">Intervalo Cron:</label>
+          <select id="intervalSelect" class="custom-select">
+            <option value="60">1 minuto</option>
+            <option value="300" selected>5 minutos</option>
+            <option value="600">10 minutos</option>
+            <option value="900">15 minutos</option>
+          </select>
+        </div>
+
+        <button id="btnToggleCron" class="btn btn-secondary">
+          <span id="cronStatusIcon">⏸</span> <span id="cronStatusText">Pausar Cron</span>
+        </button>
+
+        <button id="btnClearConsoles" class="btn btn-outline">
+          🧹 Limpiar Consolas
+        </button>
+      </div>
+    </div>
+
+    <!-- Layout Principal: Grid de Espacios & Consolas de Diagnóstico -->
+    <main class="main-content">
+      <!-- Grid de Espacios (Tarjetas de estado individual) -->
+      <section class="spaces-section">
+        <div class="section-title">
+          <h2>Espacios de Hugging Face Monitoreados</h2>
+          <span class="subtitle-small">Visita automatizada a App Directa (.hf.space) y Landing del Espacio (huggingface.co)</span>
+        </div>
+
+        <div class="spaces-grid" id="spacesGrid">
+          <!-- Se cargan dinámicamente -->
+        </div>
+      </section>
+
+      <!-- Consolas de Diagnóstico Multi-Pestaña -->
+      <section class="consoles-section">
+        <div class="console-header">
+          <div class="console-tabs">
+            <button class="tab-btn active" data-tab="general">
+              🖥️ Consola General <span class="tab-badge" id="badgeGeneral">0</span>
+            </button>
+            <button class="tab-btn" data-tab="direct">
+              ⚡ App Directa (.hf.space) <span class="tab-badge" id="badgeDirect">0</span>
+            </button>
+            <button class="tab-btn" data-tab="space">
+              🚀 Espacio HF (huggingface.co) <span class="tab-badge" id="badgeSpace">0</span>
+            </button>
+            <button class="tab-btn tab-alert" data-tab="alerts">
+              ⚠️ Alertas & Errores <span class="tab-badge badge-danger" id="badgeAlerts">0</span>
+            </button>
+          </div>
+
+          <div class="console-actions">
+            <label class="checkbox-label">
+              <input type="checkbox" id="chkAutoScroll" checked> Auto-Scroll
+            </label>
+          </div>
+        </div>
+
+        <div class="terminal-container">
+          <div class="terminal-topbar">
+            <div class="terminal-dots">
+              <span class="dot red"></span>
+              <span class="dot yellow"></span>
+              <span class="dot green"></span>
+            </div>
+            <div class="terminal-title" id="terminalTitle">root@bot-cronologico-static:~# tail -f /var/log/diagnostics.log</div>
+            <div class="terminal-status" id="wsConnectionStatus">● MODO ESTÁTICO (HF FREE)</div>
+          </div>
+
+          <!-- Paneles de Logs por cada Consola -->
+          <div class="terminal-body active" id="console-general">
+            <div class="log-welcome">--- CONSOLA GENERAL DE DIAGNÓSTICO EN TIEMPO REAL ---</div>
+          </div>
+
+          <div class="terminal-body" id="console-direct">
+            <div class="log-welcome">--- CONSOLA DE MONITOREO APPS DIRECTAS (.hf.space) ---</div>
+          </div>
+
+          <div class="terminal-body" id="console-space">
+            <div class="log-welcome">--- CONSOLA DE MONITOREO ESPACIOS HUGGINGFACE (huggingface.co/spaces) ---</div>
+          </div>
+
+          <div class="terminal-body" id="console-alerts">
+            <div class="log-welcome">--- CONSOLA DEDICADA DE ALERTAS, ERRORES Y ADVERTENCIAS DE DEGRADACIÓN ---</div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <p>Bot Cronológico &bull; 100% Gratuito en Hugging Face Static Spaces &bull; Visita y diagnóstico de 19 Hugging Face Spaces.</p>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.vscode/
+.idea/
+telethon_cuenta.session
+telethon_cuenta.session-journal
+capturas/
+.git.bak/
+**/ .git.bak/
+BrodyFileStreamBot/.git.bak/
+manga flow data/
+*.session
+*.session-journal
+videos_cache.json
+logs/
+__pycache__/

@@ -1,0 +1,7 @@
+node_modules
+dist
+downloads
+.git
+*.rar
+.env
+.DS_Store

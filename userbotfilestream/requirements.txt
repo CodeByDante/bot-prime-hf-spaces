@@ -1,0 +1,8 @@
+telethon
+opencv-python<5
+aiohttp
+curl_cffi
+beautifulsoup4
+reportlab
+firebase-admin
+telegraph

@@ -1,0 +1,9 @@
+{
+    "api_id": "33226415",
+    "api_hash": "01999dae3e5348c7ab0dbcc6f7f4edc5",
+    "backup_channel_id": -1004436872047,
+    "monitored_spaces": [
+        "https://huggingface.co/spaces/danteloyolasalvador/userbotFileStream"
+    ],
+    "check_interval_seconds": 180
+}
